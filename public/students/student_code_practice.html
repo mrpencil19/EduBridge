@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edubridge | Code Practice</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --secondary: #3f37c9;
+      --dark: #1f2937;
+      --light: #f8f9fa;
+      --success: #4cc9f0;
+      --danger: #f72585;
+      --warning: #f8961e;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f5f7fb;
+      color: var(--dark);
+      overflow-x: hidden;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      height: 100vh;
+      width: 280px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      padding-top: 20px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1040;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar a {
+      color: rgba(255, 255, 255, 0.9);
+      padding: 12px 25px;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      margin: 5px 15px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar a i {
+      margin-right: 12px;
+      font-size: 1.1rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    .sidebar a:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(5px);
+      color: white;
+    }
+
+    .sidebar a.active {
+      background: white;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .sidebar h2 {
+      color: white;
+      text-align: center;
+      margin: 1.5rem 0;
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+
+    .sidebar-footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 1rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.85rem;
+    }
+
+    /* Overlay */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(3px);
+      z-index: 1030;
+    }
+
+    /* Menu Button */
+    .menu-toggle-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      display: none;
+      z-index: 1050;
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .menu-toggle-btn:hover {
+      transform: scale(1.05);
+      background-color: var(--secondary);
+    }
+
+    /* Main Content */
+    .main-container {
+      margin-left: 280px;
+      padding: 30px;
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Code Practice Card */
+    .code-practice-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      padding: 2rem;
+    }
+
+    .code-practice-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Language Selector */
+    .language-selector {
+      position: relative;
+      max-width: 400px;
+      margin: 2rem auto;
+    }
+
+    .language-selector select {
+      width: 100%;
+      padding: 15px 25px;
+      font-size: 1rem;
+      font-weight: 500;
+      border: none;
+      border-radius: 12px;
+      background-color: white;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      appearance: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .language-selector select:focus {
+      outline: none;
+      box-shadow: 0 5px 20px rgba(67, 97, 238, 0.2);
+    }
+
+    .language-selector::after {
+      content: '\f078';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      color: var(--primary);
+      pointer-events: none;
+    }
+
+    /* Compiler Container */
+    .compiler-container {
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      margin-top: 2rem;
+      min-height: 500px;
+      background: white;
+    }
+
+    .compiler-header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .compiler-header i {
+      margin-right: 10px;
+      font-size: 1.2rem;
+    }
+
+    .compiler-header h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    /* Language Badges */
+    .language-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-right: 8px;
+      background-color: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+    }
+
+    .language-badge i {
+      margin-right: 6px;
+    }
+
+    /* Mobile Styles */
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .overlay.show {
+        display: block;
+      }
+
+      .menu-toggle-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .main-container {
+        margin-left: 0;
+        padding: 20px;
+        padding-top: 80px;
+      }
+
+      .code-practice-card {
+        padding: 1.5rem;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade {
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+  </style>
+</head>
+<body>
+  <div id="chatbot-toggle" onclick="toggleChatbot()">
+    💬
+  </div>
+  
+  <!-- Chatbot Container (Initially Hidden) -->
+  <div id="chatbot" class="chatbot-container hidden">
+    <div class="chat-header">
+        <span>CampusBot 🤖</span>
+        <span onclick="toggleChatbot()" style="float: right; cursor: pointer;">➖</span>
+      </div>
+      
+    <div class="chat-body" id="chat-body">
+        <div class="chat-body" id="chat-body">
+            <div id="typing" class="typing hidden">
+              <span></span><span></span><span></span>
+            </div>
+          </div>          
+    </div>
+    <div class="chat-footer">
+        <button onclick="startVoice()" id="mic-btn">🎤</button>
+      <input type="text" id="user-input" placeholder="Ask me anything..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+  <!-- Toggle Button -->
+  <button class="menu-toggle-btn" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar">
+    <h2><i class="fas fa-graduation-cap me-2"></i>Edubridge</h2>
+    <a href="student_dashboard.html">
+      <i class="fas fa-user"></i> Profile
+    </a>
+    <a href="student_timetable.html">
+      <i class="fas fa-calendar-alt"></i> Timetable
+    </a>
+    <a href="student_materials.html">
+      <i class="fas fa-book"></i> Materials
+    </a>
+    <a href="student_assignments.html">
+      <i class="fas fa-tasks"></i> Assignments
+    </a>
+    <a href="student_code_practice.html" class="active">
+      <i class="fas fa-code"></i> Code Practice
+    </a>
+    <a href="student_results.html">
+      <i class="fas fa-chart-line"></i> Results
+    </a>
+    <a href="#" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+    <div class="sidebar-footer">
+      © 2023 Edubridge | v1.0.0
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="code-practice-card animate-fade">
+      <h2 class="text-center mb-4"><i class="fas fa-code me-2"></i>Code Practice</h2>
+      
+      <p class="text-center text-muted mb-4">
+        Practice coding in multiple languages with our integrated compiler. Select a language below to get started.
+      </p>
+
+      <!-- Language Selection -->
+      <div class="language-selector animate-fade delay-1">
+        <select id="languageSelect" class="form-select">
+          <option value="python" selected>
+            <i class="fab fa-python"></i> Python
+          </option>
+          <option value="cpp">
+            <i class="fas fa-file-code"></i> C++
+          </option>
+          <option value="java">
+            <i class="fab fa-java"></i> Java
+          </option>
+          <option value="c">
+            <i class="fas fa-c"></i> C
+          </option>
+          <option value="php">
+            <i class="fab fa-php"></i> PHP
+          </option>
+        </select>
+      </div>
+
+      <!-- Language Badges -->
+      <div class="text-center mb-4 animate-fade delay-2">
+        <span class="language-badge">
+          <i class="fab fa-python"></i> Python
+        </span>
+        <span class="language-badge">
+          <i class="fas fa-file-code"></i> C++
+        </span>
+        <span class="language-badge">
+          <i class="fab fa-java"></i> Java
+        </span>
+        <span class="language-badge">
+          <i class="fas fa-c"></i> C
+        </span>
+        <span class="language-badge">
+          <i class="fab fa-php"></i> PHP
+        </span>
+      </div>
+
+      <!-- Compiler Display Area -->
+      <div class="compiler-container animate-fade delay-3">
+        <div class="compiler-header">
+          <i class="fas fa-code"></i>
+          <h3 id="compilerTitle">Python Compiler</h3>
+        </div>
+        <div id="compilerContent">
+          <div id="pythonCompiler" class="text-center"><div data-pym-src="https://www.jdoodle.com/embed/v1/37bf074e8826e5bc"></div></div>
+          <div id="cppCompiler" class="text-center" style="display: none;"><div data-pym-src="https://www.jdoodle.com/embed/v1/279a587b14c57fd7"></div></div>
+          <div id="javaCompiler" class="text-center" style="display: none;"><div data-pym-src="https://www.jdoodle.com/embed/v1/6bd0f37779662ea2"></div></div>
+          <div id="cCompiler" class="text-center" style="display: none;"><div data-pym-src="https://www.jdoodle.com/embed/v1/c2ee132905011c48"></div></div>
+          <div id="phpCompiler" class="text-center" style="display: none;"><div data-pym-src="https://www.jdoodle.com/embed/v1/b65938a07c87db4e"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JDoodle Script -->
+  <script src="https://www.jdoodle.com/assets/jdoodle-pym.min.js"></script>
+
+  <!-- Compiler Switching Logic -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const languageSelect = document.getElementById('languageSelect');
+      const compilerTitle = document.getElementById('compilerTitle');
+      
+      // Language names with icons for the title
+      const languageTitles = {
+        python: '<i class="fab fa-python"></i> Python Compiler',
+        cpp: '<i class="fas fa-file-code"></i> C++ Compiler',
+        java: '<i class="fab fa-java"></i> Java Compiler',
+        c: '<i class="fas fa-c"></i> C Compiler',
+        php: '<i class="fab fa-php"></i> PHP Compiler'
+      };
+
+      languageSelect.addEventListener('change', function() {
+        const selectedLang = this.value;
+        
+        // Hide all compilers
+        document.querySelectorAll('#compilerContent > div').forEach(div => {
+          div.style.display = 'none';
+        });
+        
+        // Show selected compiler
+        document.getElementById(selectedLang + 'Compiler').style.display = 'block';
+        
+        // Update compiler title
+        compilerTitle.innerHTML = languageTitles[selectedLang];
+      });
+
+      // Initialize with Python selected
+      languageSelect.dispatchEvent(new Event('change'));
+    });
+  </script>
+
+  <!-- Firebase Auth -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD0jz3MOwhA68S7FZkTcN23Ld3olEooaBQ",
+      authDomain: "campusbridge-528c5.firebaseapp.com",
+      projectId: "campusbridge-528c5",
+      storageBucket: "campusbridge-528c5.appspot.com",
+      messagingSenderId: "327991838083",
+      appId: "1:327991838083:web:08964091aaca33752922b6",
+      measurementId: "G-XQ99JCQTDB"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+      }
+    });
+
+    window.logout = async function() {
+      if (confirm("Are you sure you want to logout?")) {
+        try {
+          await signOut(auth);
+          window.location.href = "login.html";
+        } catch (error) {
+          alert("Logout failed. Please try again.");
+        }
+      }
+    };
+
+    window.toggleSidebar = function() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("overlay");
+      sidebar.classList.toggle("show");
+      overlay.classList.toggle("show");
+      
+      // Toggle menu icon
+      const menuBtn = document.querySelector('.menu-toggle-btn');
+      if (sidebar.classList.contains('show')) {
+        menuBtn.innerHTML = '<i class="fas fa-times"></i>';
+      } else {
+        menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+      }
+    };
+  </script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

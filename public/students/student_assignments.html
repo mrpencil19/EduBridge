@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Assignments | Campus Bridge</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --secondary: #3f37c9;
+      --dark: #1f2937;
+      --light: #f8f9fa;
+      --success: #4cc9f0;
+      --danger: #f72585;
+      --warning: #f8961e;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f5f7fb;
+      color: var(--dark);
+      min-height: 100vh;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      height: 100vh;
+      width: 280px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      padding-top: 20px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1040;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar a {
+      color: rgba(255, 255, 255, 0.9);
+      padding: 12px 25px;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      margin: 5px 15px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar a i {
+      margin-right: 12px;
+      font-size: 1.1rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    .sidebar a:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(5px);
+      color: white;
+    }
+
+    .sidebar a.active {
+      background: white;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .sidebar h2 {
+      color: white;
+      text-align: center;
+      margin: 1.5rem 0;
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+
+    .sidebar-footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 1rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.85rem;
+    }
+
+    /* Overlay */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(3px);
+      z-index: 1030;
+    }
+
+    /* Menu Button */
+    .menu-toggle-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      display: none;
+      z-index: 1050;
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .menu-toggle-btn:hover {
+      transform: scale(1.05);
+      background-color: var(--secondary);
+    }
+
+    /* Main Content */
+    .main-container {
+      margin-left: 280px;
+      padding: 30px;
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Page Header */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .page-title {
+      font-weight: 600;
+      color: var(--dark);
+      margin: 0;
+    }
+
+    /* Assignments Card */
+    .assignments-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .assignments-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      padding: 1.5rem;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title {
+      font-weight: 500;
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    /* Tabs */
+    .nav-tabs {
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .nav-tabs .nav-link {
+      color: #6b7280;
+      border: none;
+      padding: 10px 20px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tabs .nav-link:hover {
+      color: var(--primary);
+    }
+
+    .nav-tabs .nav-link.active {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+      background-color: transparent;
+    }
+
+    /* Assignments Table */
+    .assignments-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    .assignments-table th {
+      background-color: #f8f9fa;
+      color: #6b7280;
+      font-weight: 500;
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .assignments-table td {
+      padding: 15px;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: middle;
+    }
+
+    .assignments-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .assignments-table tr:hover td {
+      background-color: #f9fafb;
+    }
+
+    /* Badges */
+    .badge {
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+      font-size: 0.75rem;
+    }
+
+    .badge-primary {
+      background-color: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+    }
+
+    .badge-success {
+      background-color: rgba(76, 201, 240, 0.1);
+      color: var(--success);
+    }
+
+    .badge-warning {
+      background-color: rgba(248, 150, 30, 0.1);
+      color: var(--warning);
+    }
+
+    .badge-danger {
+      background-color: rgba(247, 37, 133, 0.1);
+      color: var(--danger);
+    }
+
+    /* Action Buttons */
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background-color: transparent;
+      color: #6b7280;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background-color: #f3f4f6;
+      color: var(--primary);
+    }
+
+    /* Submit Button */
+    .submit-btn {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 0;
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      color: #d1d5db;
+      margin-bottom: 1rem;
+    }
+
+    .empty-text {
+      color: #6b7280;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Status Indicator */
+    .status-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .status-pending {
+      background-color: var(--warning);
+    }
+
+    .status-submitted {
+      background-color: var(--success);
+    }
+
+    .status-late {
+      background-color: var(--danger);
+    }
+
+    /* File Attachment */
+    .file-attachment {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      background-color: #f3f4f6;
+      border-radius: 6px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+
+    .file-attachment i {
+      margin-right: 6px;
+      color: #6b7280;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade {
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+
+    /* Mobile Styles */
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .overlay.show {
+        display: block;
+      }
+
+      .menu-toggle-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .main-container {
+        margin-left: 0;
+        padding: 20px;
+        padding-top: 80px;
+      }
+
+      .assignments-table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="chatbot-toggle" onclick="toggleChatbot()">
+    💬
+  </div>
+  
+  <!-- Chatbot Container (Initially Hidden) -->
+  <div id="chatbot" class="chatbot-container hidden">
+    <div class="chat-header">
+        <span>CampusBot 🤖</span>
+        <span onclick="toggleChatbot()" style="float: right; cursor: pointer;">➖</span>
+      </div>
+      
+    <div class="chat-body" id="chat-body">
+        <div class="chat-body" id="chat-body">
+            <div id="typing" class="typing hidden">
+              <span></span><span></span><span></span>
+            </div>
+          </div>          
+    </div>
+    <div class="chat-footer">
+        <button onclick="startVoice()" id="mic-btn">🎤</button>
+      <input type="text" id="user-input" placeholder="Ask me anything..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+  <!-- Toggle Button -->
+  <button class="menu-toggle-btn" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar">
+    <h2><i class="fas fa-graduation-cap me-2"></i>Campus Bridge</h2>
+    <a href="student_dashboard.html">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+    <a href="student_timetable.html" >
+      <i class="fas fa-calendar-alt"></i> Timetable
+    </a>
+    <a href="student_courses.html">
+      <i class="fas fa-book-open"></i> Courses
+    </a>
+    <a href="student_assignments.html" class="active">
+      <i class="fas fa-tasks"></i> Assignments
+    </a>
+    <a href="student_attendance.html">
+      <i class="fas fa-clipboard-check"></i> Attendance
+    </a>
+    <a href="student_code_practice.html">
+      <i class="fas fa-code"></i> Code Practice
+    </a>
+    <a href="student_results.html">
+      <i class="fas fa-clipboard-check"></i> Results
+    </a>
+    <a href="#" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+    <div class="sidebar-footer">
+      © 2023 Campus Bridge | v1.0.0
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="page-header animate-fade">
+      <h1 class="page-title">My Assignments</h1>
+    </div>
+
+    <div class="assignments-card animate-fade delay-1">
+      <div class="card-header">
+        <h3 class="card-title">All Assignments</h3>
+        <div class="dropdown">
+          <button class="action-btn" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-filter"></i>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+            <li><a class="dropdown-item" href="#" onclick="filterAssignments('all')">All Assignments</a></li>
+            <li><a class="dropdown-item" href="#" onclick="filterAssignments('pending')">Pending</a></li>
+            <li><a class="dropdown-item" href="#" onclick="filterAssignments('submitted')">Submitted</a></li>
+            <li><a class="dropdown-item" href="#" onclick="filterAssignments('overdue')">Overdue</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-body">
+        <ul class="nav nav-tabs mb-4" id="assignmentsTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">All</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="active-tab" data-bs-toggle="tab" data-bs-target="#active" type="button" role="tab">Active</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button" role="tab">Completed</button>
+          </li>
+        </ul>
+        
+        <div class="tab-content" id="assignmentsTabContent">
+          <div class="tab-pane fade show active" id="all" role="tabpanel">
+            <div class="table-responsive">
+              <table class="assignments-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Course</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="assignmentsTableBody">
+                  <!-- Assignments will be loaded here -->
+                  <tr>
+                    <td colspan="5" class="text-center py-4">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="active" role="tabpanel">
+            <div id="activeAssignments">
+              <!-- Active assignments will be loaded here -->
+            </div>
+          </div>
+          <div class="tab-pane fade" id="completed" role="tabpanel">
+            <div id="completedAssignments">
+              <!-- Completed assignments will be loaded here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assignment Details Modal -->
+  <div class="modal fade" id="assignmentDetailsModal" tabindex="-1" aria-labelledby="assignmentDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="assignmentDetailsModalLabel">Assignment Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="assignmentDetailsContent">
+          <!-- Assignment details will be loaded here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="submitAssignmentBtn" onclick="openSubmissionModal()">Submit Assignment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit Assignment Modal -->
+  <div class="modal fade" id="submitAssignmentModal" tabindex="-1" aria-labelledby="submitAssignmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="submitAssignmentModalLabel">Submit Assignment</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="submitAssignmentForm">
+            <div class="mb-3">
+              <label for="submissionNotes" class="form-label">Notes (Optional)</label>
+              <textarea class="form-control" id="submissionNotes" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="submissionFiles" class="form-label">Upload Files</label>
+              <input type="file" class="form-control" id="submissionFiles" multiple required>
+              <div class="form-text">Upload your assignment files (PDF, DOC, PPT, etc.)</div>
+            </div>
+            <input type="hidden" id="currentAssignmentId">
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="submitAssignment()">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { 
+      getFirestore, 
+      doc, 
+      getDoc, 
+      collection, 
+      getDocs, 
+      query, 
+      where, 
+      addDoc, 
+      updateDoc 
+    } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+    import { 
+      getStorage, 
+      ref, 
+      uploadBytes, 
+      getDownloadURL 
+    } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-storage.js";
+  
+    const firebaseConfig = {
+      apiKey: "AIzaSyD0jz3MOwhA68S7FZkTcN23Ld3olEooaBQ",
+      authDomain: "campusbridge-528c5.firebaseapp.com",
+      projectId: "campusbridge-528c5",
+      storageBucket: "campusbridge-528c5.appspot.com",
+      messagingSenderId: "your-msg-id",
+      appId: "your-app-id"
+    };
+  
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const storage = getStorage(app);
+  
+    let currentStudent = null;
+    let currentAssignmentId = null;
+  
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Get student data including enrolled courses
+        const studentDoc = await getDoc(doc(db, "students", user.uid));
+        if (studentDoc.exists()) {
+          currentStudent = {
+            id: user.uid,
+            ...studentDoc.data()
+          };
+          
+          // Load assignments for the student's courses and section
+          await loadStudentAssignments();
+        } else {
+          alert("Student data not found!");
+          window.location.href = "student_login.html";
+        }
+      } else {
+        window.location.href = "student_login.html";
+      }
+    });
+  
+    async function loadStudentAssignments() {
+      try {
+        // First get all courses the student is enrolled in
+        const enrollmentsQuery = query(
+          collection(db, "enrollments"),
+          where("studentId", "==", currentStudent.id)
+        );
+        const enrollmentsSnapshot = await getDocs(enrollmentsQuery);
+        
+        if (enrollmentsSnapshot.empty) {
+          showNoAssignmentsMessage();
+          return;
+        }
+  
+        // Get course IDs from enrollments
+        const courseIds = enrollmentsSnapshot.docs.map(doc => doc.data().courseId);
+        
+        // Get assignments for these courses and matching section
+        const assignmentsQuery = query(
+          collection(db, "assignments"),
+          where("courseId", "in", courseIds),
+          where("section", "==", currentStudent.section)
+        );
+        
+        const assignmentsSnapshot = await getDocs(assignmentsQuery);
+        const assignmentsTableBody = document.getElementById("assignmentsTableBody");
+        assignmentsTableBody.innerHTML = "";
+        
+        if (assignmentsSnapshot.empty) {
+          showNoAssignmentsMessage();
+          return;
+        }
+        
+        // Get course details for display
+        const coursesSnapshot = await getDocs(collection(db, "courses"));
+        const courses = {};
+        coursesSnapshot.forEach(doc => {
+          courses[doc.id] = doc.data();
+        });
+        
+        // Get student's submissions
+        const submissionsQuery = query(
+          collection(db, "submissions"),
+          where("studentId", "==", currentStudent.id)
+        );
+        const submissionsSnapshot = await getDocs(submissionsQuery);
+        const submissions = {};
+        submissionsSnapshot.forEach(doc => {
+          submissions[doc.data().assignmentId] = doc.data();
+        });
+        
+        // Process each assignment
+        assignmentsSnapshot.forEach(async (doc) => {
+          const assignment = doc.data();
+          const course = courses[assignment.courseId] || {};
+          const dueDate = assignment.dueDate ? new Date(assignment.dueDate.seconds * 1000) : null;
+          const formattedDueDate = dueDate ? dueDate.toLocaleDateString() + ' ' + dueDate.toLocaleTimeString() : 'N/A';
+          
+          // Check submission status
+          const submission = submissions[doc.id] || null;
+          const isSubmitted = submission !== null;
+          const isLate = isSubmitted && dueDate && new Date(submission.submittedAt.seconds * 1000) > dueDate;
+          
+          let statusBadge;
+          if (isSubmitted) {
+            statusBadge = `<span class="badge badge-success"><span class="status-indicator status-submitted"></span>Submitted</span>`;
+          } else if (new Date() > dueDate) {
+            statusBadge = `<span class="badge badge-danger"><span class="status-indicator status-late"></span>Overdue</span>`;
+          } else {
+            statusBadge = `<span class="badge badge-warning"><span class="status-indicator status-pending"></span>Pending</span>`;
+          }
+          
+          const row = `
+            <tr>
+              <td>${assignment.title || 'N/A'}</td>
+              <td>${course.code || 'N/A'} - ${course.section || 'N/A'}</td>
+              <td>${formattedDueDate}</td>
+              <td>${statusBadge}</td>
+              <td>
+                <div class="d-flex gap-2">
+                  <button class="action-btn" onclick="viewAssignment('${doc.id}')">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  ${!isSubmitted ? `
+                  <button class="submit-btn" onclick="prepareSubmission('${doc.id}')">
+                    <i class="fas fa-paper-plane me-1"></i> Submit
+                  </button>
+                  ` : ''}
+                </div>
+              </td>
+            </tr>
+          `;
+          assignmentsTableBody.innerHTML += row;
+        });
+      } catch (error) {
+        console.error("Error loading assignments:", error);
+        showErrorMessage();
+      }
+    }
+  
+    function showNoAssignmentsMessage() {
+      const assignmentsTableBody = document.getElementById("assignmentsTableBody");
+      assignmentsTableBody.innerHTML = `
+        <tr>
+          <td colspan="5" class="text-center py-5">
+            <div class="empty-state">
+              <i class="fas fa-tasks empty-icon"></i>
+              <h5 class="empty-text">No assignments found</h5>
+              <p class="text-muted">You currently have no assignments assigned to you.</p>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+  
+    function showErrorMessage() {
+      const assignmentsTableBody = document.getElementById("assignmentsTableBody");
+      assignmentsTableBody.innerHTML = `
+        <tr>
+          <td colspan="5" class="text-center py-5 text-danger">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            Error loading assignments. Please try again.
+          </td>
+        </tr>
+      `;
+    }
+
+    window.viewAssignment = async function(assignmentId) {
+      try {
+        const docRef = doc(db, "assignments", assignmentId);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const assignment = docSnap.data();
+          const dueDate = assignment.dueDate ? new Date(assignment.dueDate.seconds * 1000) : null;
+          const formattedDueDate = dueDate ? dueDate.toLocaleDateString() + ' ' + dueDate.toLocaleTimeString() : 'N/A';
+          
+          // Get course details
+          let courseName = 'N/A';
+          if (assignment.courseId) {
+            const courseDoc = await getDoc(doc(db, "courses", assignment.courseId));
+            if (courseDoc.exists()) {
+              const course = courseDoc.data();
+              courseName = `${course.code} - ${course.name} (${course.section})`;
+            }
+          }
+          
+          // Check if assignment is submitted
+          const submissionQuery = query(
+            collection(db, "submissions"),
+            where("assignmentId", "==", assignmentId),
+            where("studentId", "==", currentStudent.id)
+          );
+          const submissionSnapshot = await getDocs(submissionQuery);
+          const submission = submissionSnapshot.empty ? null : submissionSnapshot.docs[0].data();
+          
+          let submissionStatus = '';
+          let submissionDate = '';
+          let submissionNotes = '';
+          let submissionFiles = '';
+          
+          if (submission) {
+            const subDate = submission.submittedAt ? new Date(submission.submittedAt.seconds * 1000) : null;
+            submissionDate = subDate ? subDate.toLocaleDateString() + ' ' + subDate.toLocaleTimeString() : 'N/A';
+            submissionStatus = subDate && dueDate && subDate > dueDate ? 
+              '<span class="badge badge-danger">Submitted Late</span>' : 
+              '<span class="badge badge-success">Submitted On Time</span>';
+            
+            submissionNotes = submission.notes || 'No notes provided.';
+            
+            if (submission.files && submission.files.length > 0) {
+              submissionFiles = '<h6 class="mt-3">Submitted Files:</h6><div class="d-flex flex-wrap">';
+              submission.files.forEach(file => {
+                submissionFiles += `
+                  <div class="file-attachment">
+                    <i class="fas fa-file"></i>
+                    <a href="${file.url}" target="_blank">${file.name}</a>
+                  </div>
+                `;
+              });
+              submissionFiles += '</div>';
+            }
+          }
+          
+          const content = `
+            <div class="mb-4">
+              <h4>${assignment.title || 'N/A'}</h4>
+              <p class="text-muted">${courseName}</p>
+            </div>
+            
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <h6>Due Date</h6>
+                <p>${formattedDueDate}</p>
+              </div>
+              <div class="col-md-6">
+                <h6>Status</h6>
+                <p>${submission ? submissionStatus : 
+                  new Date() > dueDate ? 
+                  '<span class="badge badge-danger">Overdue</span>' : 
+                  '<span class="badge badge-warning">Pending Submission</span>'}</p>
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <h6>Description</h6>
+              <p>${assignment.description || 'No description provided.'}</p>
+            </div>
+            
+            ${assignment.attachments && assignment.attachments.length > 0 ? `
+            <div class="mb-4">
+              <h6>Assignment Files</h6>
+              <div class="d-flex flex-wrap">
+                ${assignment.attachments.map(file => `
+                  <div class="file-attachment">
+                    <i class="fas fa-file"></i>
+                    <a href="${file.url}" target="_blank">${file.name}</a>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            ` : ''}
+            
+            ${submission ? `
+            <div class="mb-4">
+              <h6>Your Submission</h6>
+              <p><strong>Submitted on:</strong> ${submissionDate}</p>
+              <p><strong>Notes:</strong> ${submissionNotes}</p>
+              ${submissionFiles}
+            </div>
+            ` : ''}
+          `;
+          
+          document.getElementById("assignmentDetailsContent").innerHTML = content;
+          document.getElementById("submitAssignmentBtn").style.display = submission ? 'none' : 'block';
+          currentAssignmentId = assignmentId;
+          
+          // Show modal
+          const modal = new bootstrap.Modal(document.getElementById('assignmentDetailsModal'));
+          modal.show();
+        } else {
+          alert("Assignment not found!");
+        }
+      } catch (error) {
+        console.error("Error viewing assignment:", error);
+        alert("Failed to load assignment details. Please try again.");
+      }
+    };
+
+    window.prepareSubmission = function(assignmentId) {
+      currentAssignmentId = assignmentId;
+      document.getElementById("currentAssignmentId").value = assignmentId;
+      document.getElementById("submitAssignmentForm").reset();
+      
+      const modal = new bootstrap.Modal(document.getElementById('submitAssignmentModal'));
+      modal.show();
+    };
+
+    window.openSubmissionModal = function() {
+      prepareSubmission(currentAssignmentId);
+      bootstrap.Modal.getInstance(document.getElementById('assignmentDetailsModal')).hide();
+    };
+
+    window.submitAssignment = async function() {
+      const notes = document.getElementById("submissionNotes").value;
+      const filesInput = document.getElementById("submissionFiles");
+      const assignmentId = document.getElementById("currentAssignmentId").value;
+      
+      if (!filesInput.files || filesInput.files.length === 0) {
+        alert("Please upload at least one file for your submission.");
+        return;
+      }
+      
+      try {
+        // Upload files to storage
+        const files = [];
+        for (let i = 0; i < filesInput.files.length; i++) {
+          const file = filesInput.files[i];
+          const storageRef = ref(storage, `submissions/${assignmentId}/${currentStudent.id}/${file.name}`);
+          await uploadBytes(storageRef, file);
+          const downloadURL = await getDownloadURL(storageRef);
+          files.push({
+            name: file.name,
+            url: downloadURL
+          });
+        }
+        
+        // Create submission record
+        await addDoc(collection(db, "submissions"), {
+          assignmentId,
+          studentId: currentStudent.id,
+          studentName: currentStudent.name,
+          studentRoll: currentStudent.roll,
+          files,
+          notes,
+          submittedAt: new Date(),
+          status: "submitted",
+          grade: null,
+          feedback: null
+        });
+        
+        // Update assignment submission count
+        const assignmentRef = doc(db, "assignments", assignmentId);
+        const assignmentDoc = await getDoc(assignmentRef);
+        if (assignmentDoc.exists()) {
+          const currentSubmissions = assignmentDoc.data().submissions || 0;
+          await updateDoc(assignmentRef, {
+            submissions: currentSubmissions + 1
+          });
+        }
+        
+        // Close modal and reload assignments
+        bootstrap.Modal.getInstance(document.getElementById('submitAssignmentModal')).hide();
+        await loadAssignments(currentStudent.section);
+        
+        // Show success message
+        alert("Assignment submitted successfully!");
+      } catch (error) {
+        console.error("Error submitting assignment:", error);
+        alert("Failed to submit assignment. Please try again.");
+      }
+    };
+
+    window.filterAssignments = function(filter) {
+      alert("Filtering assignments by: " + filter);
+      // In a real implementation, you would filter the assignments table
+    };
+
+    window.toggleSidebar = function() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("overlay");
+      sidebar.classList.toggle("show");
+      overlay.classList.toggle("show");
+      
+      // Toggle menu icon
+      const menuBtn = document.querySelector('.menu-toggle-btn');
+      if (sidebar.classList.contains('show')) {
+        menuBtn.innerHTML = '<i class="fas fa-times"></i>';
+      } else {
+        menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+      }
+    };
+
+    window.logout = async function() {
+      if (confirm("Are you sure you want to logout?")) {
+        try {
+          await signOut(auth);
+          window.location.href = "student_login.html";
+        } catch (error) {
+          alert("Logout failed. Please try again.");
+        }
+      }
+    };
+  </script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Font Awesome -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</body>
+</html>

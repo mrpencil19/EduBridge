@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Assignments | Campus Bridge</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --secondary: #3f37c9;
+      --dark: #1f2937;
+      --light: #f8f9fa;
+      --success: #4cc9f0;
+      --danger: #f72585;
+      --warning: #f8961e;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f5f7fb;
+      color: var(--dark);
+      min-height: 100vh;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      height: 100vh;
+      width: 280px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      padding-top: 20px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1040;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar a {
+      color: rgba(255, 255, 255, 0.9);
+      padding: 12px 25px;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      margin: 5px 15px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar a i {
+      margin-right: 12px;
+      font-size: 1.1rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    .sidebar a:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(5px);
+      color: white;
+    }
+
+    .sidebar a.active {
+      background: white;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .sidebar h2 {
+      color: white;
+      text-align: center;
+      margin: 1.5rem 0;
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+
+    .sidebar-footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 1rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.85rem;
+    }
+
+    /* Overlay */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(3px);
+      z-index: 1030;
+    }
+
+    /* Menu Button */
+    .menu-toggle-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      display: none;
+      z-index: 1050;
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .menu-toggle-btn:hover {
+      transform: scale(1.05);
+      background-color: var(--secondary);
+    }
+
+    /* Main Content */
+    .main-container {
+      margin-left: 280px;
+      padding: 30px;
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Page Header */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .page-title {
+      font-weight: 600;
+      color: var(--dark);
+      margin: 0;
+    }
+
+    /* Assignments Card */
+    .assignments-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .assignments-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      padding: 1.5rem;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title {
+      font-weight: 500;
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    /* Tabs */
+    .nav-tabs {
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .nav-tabs .nav-link {
+      color: #6b7280;
+      border: none;
+      padding: 10px 20px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tabs .nav-link:hover {
+      color: var(--primary);
+    }
+
+    .nav-tabs .nav-link.active {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+      background-color: transparent;
+    }
+
+    /* Assignments Table */
+    .assignments-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    .assignments-table th {
+      background-color: #f8f9fa;
+      color: #6b7280;
+      font-weight: 500;
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .assignments-table td {
+      padding: 15px;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: middle;
+    }
+
+    .assignments-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .assignments-table tr:hover td {
+      background-color: #f9fafb;
+    }
+
+    /* Badges */
+    .badge {
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+      font-size: 0.75rem;
+    }
+
+    .badge-primary {
+      background-color: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+    }
+
+    .badge-success {
+      background-color: rgba(76, 201, 240, 0.1);
+      color: var(--success);
+    }
+
+    .badge-warning {
+      background-color: rgba(248, 150, 30, 0.1);
+      color: var(--warning);
+    }
+
+    .badge-danger {
+      background-color: rgba(247, 37, 133, 0.1);
+      color: var(--danger);
+    }
+
+    /* Action Buttons */
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background-color: transparent;
+      color: #6b7280;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background-color: #f3f4f6;
+      color: var(--primary);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 0;
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      color: #d1d5db;
+      margin-bottom: 1rem;
+    }
+
+    .empty-text {
+      color: #6b7280;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Add Assignment Button */
+    .add-assignment-btn {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
+    }
+
+    .add-assignment-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
+    }
+
+    .add-assignment-btn i {
+      margin-right: 8px;
+    }
+
+    /* Modal Styles */
+    .modal-header {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .modal-footer {
+      border-top: none;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade {
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+
+    /* Mobile Styles */
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .overlay.show {
+        display: block;
+      }
+
+      .menu-toggle-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .main-container {
+        margin-left: 0;
+        padding: 20px;
+        padding-top: 80px;
+      }
+
+      .assignments-table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Toggle Button -->
+  <button class="menu-toggle-btn" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar">
+    <h2><i class="fas fa-graduation-cap me-2"></i>Campus Bridge</h2>
+    <a href="faculty_dashboard.html">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+    <a href="faculty_courses.html">
+      <i class="fas fa-book-open"></i> Courses
+    </a>
+    <a href="faculty_assignments.html" class="active">
+      <i class="fas fa-tasks"></i> Assignments
+    </a>
+    <a href="faculty_attendance.html">
+      <i class="fas fa-clipboard-check"></i> Attendance
+    </a>
+    <a href="#" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+    <div class="sidebar-footer">
+      © 2023 Campus Bridge | v1.0.0
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="page-header animate-fade">
+      <h1 class="page-title">Assignments</h1>
+      <button class="add-assignment-btn" data-bs-toggle="modal" data-bs-target="#addAssignmentModal">
+        <i class="fas fa-plus"></i> Create Assignment
+      </button>
+    </div>
+
+    <div class="assignments-card animate-fade delay-1">
+      <div class="card-header">
+        <h3 class="card-title">All Assignments</h3>
+        <div class="dropdown">
+          <button class="action-btn" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-filter"></i>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+            <li><a class="dropdown-item" href="#" onclick="filterAssignments('all')">All Assignments</a></li>
+            <li><a class="dropdown-item" href="#" onclick="filterAssignments('active')">Active</a></li>
+            <li><a class="dropdown-item" href="#" onclick="filterAssignments('graded')">Graded</a></li>
+            <li><a class="dropdown-item" href="#" onclick="filterAssignments('overdue')">Overdue</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-body">
+        <ul class="nav nav-tabs mb-4" id="assignmentsTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">All</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">Pending</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="submitted-tab" data-bs-toggle="tab" data-bs-target="#submitted" type="button" role="tab">Submitted</button>
+          </li>
+        </ul>
+        
+        <div class="tab-content" id="assignmentsTabContent">
+          <div class="tab-pane fade show active" id="all" role="tabpanel">
+            <div class="table-responsive">
+              <table class="assignments-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Course</th>
+                    <th>Due Date</th>
+                    <th>Submissions</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="assignmentsTableBody">
+                  <!-- Assignments will be loaded here -->
+                  <tr>
+                    <td colspan="6" class="text-center py-4">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="pending" role="tabpanel">
+            <div id="pendingAssignments">
+              <!-- Pending assignments will be loaded here -->
+            </div>
+          </div>
+          <div class="tab-pane fade" id="submitted" role="tabpanel">
+            <div id="submittedAssignments">
+              <!-- Submitted assignments will be loaded here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Assignment Modal -->
+  <div class="modal fade" id="addAssignmentModal" tabindex="-1" aria-labelledby="addAssignmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addAssignmentModalLabel">Create New Assignment</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addAssignmentForm">
+            <div class="mb-3">
+              <label for="assignmentTitle" class="form-label">Title</label>
+              <input type="text" class="form-control" id="assignmentTitle" required>
+            </div>
+            <div class="mb-3">
+              <label for="assignmentCourse" class="form-label">Course</label>
+              <select class="form-select" id="assignmentCourse" required>
+                <option value="" selected disabled>Select Course</option>
+                <!-- Courses will be loaded here -->
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="assignmentDueDate" class="form-label">Due Date</label>
+              <input type="datetime-local" class="form-control" id="assignmentDueDate" required>
+            </div>
+            <div class="mb-3">
+              <label for="assignmentDescription" class="form-label">Description</label>
+              <textarea class="form-control" id="assignmentDescription" rows="4"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="assignmentFiles" class="form-label">Attachments (Optional)</label>
+              <input type="file" class="form-control" id="assignmentFiles" multiple>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="createAssignment()">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Assignment Modal -->
+  <div class="modal fade" id="viewAssignmentModal" tabindex="-1" aria-labelledby="viewAssignmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="viewAssignmentModalLabel">Assignment Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="assignmentDetailsContent">
+          <!-- Assignment details will be loaded here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, collection, getDocs, query, where, addDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD0jz3MOwhA68S7FZkTcN23Ld3olEooaBQ",
+      authDomain: "campusbridge-528c5.firebaseapp.com",
+      projectId: "campusbridge-528c5",
+      storageBucket: "campusbridge-528c5.appspot.com",
+      messagingSenderId: "327991838083",
+      appId: "1:327991838083:web:08964091aaca33752922b6",
+      measurementId: "G-XQ99JCQTDB"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        await loadCoursesForDropdown(user.uid);
+        await loadAssignments(user.uid);
+      } else {
+        window.location.href = "faculty_login.html";
+      }
+    });
+
+    async function loadCoursesForDropdown(facultyId) {
+      try {
+        const coursesRef = collection(db, "courses");
+        const q = query(coursesRef, where("facultyId", "==", facultyId), where("status", "==", "active"));
+        const querySnapshot = await getDocs(q);
+        
+        const courseSelect = document.getElementById("assignmentCourse");
+        courseSelect.innerHTML = '<option value="" selected disabled>Select Course</option>';
+        
+        querySnapshot.forEach((doc) => {
+          const course = doc.data();
+          const option = document.createElement("option");
+          option.value = doc.id;
+          option.textContent = `${course.code} - ${course.name} (${course.section})`;
+          courseSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error loading courses for dropdown:", error);
+      }
+    }
+
+    async function loadAssignments(facultyId) {
+      try {
+        const assignmentsRef = collection(db, "assignments");
+        const q = query(assignmentsRef, where("facultyId", "==", facultyId));
+        const querySnapshot = await getDocs(q);
+        
+        const assignmentsTableBody = document.getElementById("assignmentsTableBody");
+        assignmentsTableBody.innerHTML = "";
+        
+        if (querySnapshot.empty) {
+          assignmentsTableBody.innerHTML = `
+            <tr>
+              <td colspan="6" class="text-center py-5">
+                <div class="empty-state">
+                  <i class="fas fa-tasks empty-icon"></i>
+                  <h5 class="empty-text">No assignments found</h5>
+                  <button class="add-assignment-btn" data-bs-toggle="modal" data-bs-target="#addAssignmentModal">
+                    <i class="fas fa-plus"></i> Create Your First Assignment
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+        
+        // We'll also need to load course names for each assignment
+        const coursesSnapshot = await getDocs(collection(db, "courses"));
+        const courses = {};
+        coursesSnapshot.forEach(doc => {
+          courses[doc.id] = doc.data();
+        });
+        
+        querySnapshot.forEach((doc) => {
+          const assignment = doc.data();
+          const course = courses[assignment.courseId] || {};
+          
+          const dueDate = assignment.dueDate ? new Date(assignment.dueDate.seconds * 1000) : null;
+          const formattedDueDate = dueDate ? dueDate.toLocaleDateString() + ' ' + dueDate.toLocaleTimeString() : 'N/A';
+          
+          let statusBadge;
+          if (assignment.status === 'graded') {
+            statusBadge = `<span class="badge badge-success">Graded</span>`;
+          } else if (new Date() > dueDate) {
+            statusBadge = `<span class="badge badge-danger">Overdue</span>`;
+          } else {
+            statusBadge = `<span class="badge badge-warning">Pending</span>`;
+          }
+          
+          const row = `
+            <tr>
+              <td>${assignment.title || 'N/A'}</td>
+              <td>${course.code || 'N/A'} - ${course.section || 'N/A'}</td>
+              <td>${formattedDueDate}</td>
+              <td>${assignment.submissions || 0}/${assignment.totalStudents || 0}</td>
+              <td>${statusBadge}</td>
+              <td>
+                <div class="d-flex gap-2">
+                  <button class="action-btn" onclick="viewAssignment('${doc.id}')">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="action-btn" onclick="editAssignment('${doc.id}')">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="action-btn text-danger" onclick="deleteAssignment('${doc.id}')">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+          assignmentsTableBody.innerHTML += row;
+        });
+      } catch (error) {
+        console.error("Error loading assignments:", error);
+        assignmentsTableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="text-center py-5 text-danger">
+              <i class="fas fa-exclamation-circle me-2"></i>
+              Error loading assignments. Please try again.
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    window.createAssignment = async function() {
+      const title = document.getElementById("assignmentTitle").value;
+      const courseId = document.getElementById("assignmentCourse").value;
+      const dueDate = document.getElementById("assignmentDueDate").value;
+      const description = document.getElementById("assignmentDescription").value;
+      
+      if (!title || !courseId || !dueDate) {
+        alert("Please fill in all required fields");
+        return;
+      }
+      
+      try {
+        const user = auth.currentUser;
+        if (!user) throw new Error("User not authenticated");
+        
+        await addDoc(collection(db, "assignments"), {
+          title,
+          courseId,
+          dueDate: new Date(dueDate),
+          description,
+          facultyId: user.uid,
+          status: "pending",
+          submissions: 0,
+          totalStudents: 0,
+          createdAt: new Date()
+        });
+        
+        // Close modal and reset form
+        bootstrap.Modal.getInstance(document.getElementById('addAssignmentModal')).hide();
+        document.getElementById("addAssignmentForm").reset();
+        
+        // Reload assignments
+        await loadAssignments(user.uid);
+        
+        // Show success message
+        alert("Assignment created successfully!");
+      } catch (error) {
+        console.error("Error creating assignment:", error);
+        alert("Failed to create assignment. Please try again.");
+      }
+    };
+
+    window.viewAssignment = async function(assignmentId) {
+      try {
+        const docRef = doc(db, "assignments", assignmentId);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const assignment = docSnap.data();
+          const dueDate = assignment.dueDate ? new Date(assignment.dueDate.seconds * 1000) : null;
+          const formattedDueDate = dueDate ? dueDate.toLocaleDateString() + ' ' + dueDate.toLocaleTimeString() : 'N/A';
+          
+          // Get course details
+          let courseName = 'N/A';
+          if (assignment.courseId) {
+            const courseDoc = await getDoc(doc(db, "courses", assignment.courseId));
+            if (courseDoc.exists()) {
+              const course = courseDoc.data();
+              courseName = `${course.code} - ${course.name} (${course.section})`;
+            }
+          }
+          
+          const content = `
+            <div class="mb-4">
+              <h4>${assignment.title || 'N/A'}</h4>
+              <p class="text-muted">${courseName}</p>
+            </div>
+            
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <h6>Due Date</h6>
+                <p>${formattedDueDate}</p>
+              </div>
+              <div class="col-md-6">
+                <h6>Status</h6>
+                <p>${
+                  assignment.status === 'graded' ? 
+                  '<span class="badge badge-success">Graded</span>' : 
+                  new Date() > dueDate ? 
+                  '<span class="badge badge-danger">Overdue</span>' : 
+                  '<span class="badge badge-warning">Pending</span>'
+                }</p>
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <h6>Description</h6>
+              <p>${assignment.description || 'No description provided.'}</p>
+            </div>
+            
+            <div class="mb-4">
+              <h6>Submissions</h6>
+              <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: ${assignment.totalStudents ? (assignment.submissions / assignment.totalStudents * 100) : 0}%">
+                  ${assignment.submissions || 0}/${assignment.totalStudents || 0}
+                </div>
+              </div>
+            </div>
+          `;
+          document.getElementById("assignmentDetailsContent").innerHTML = content;
+          
+          // Show modal
+          const modal = new bootstrap.Modal(document.getElementById('viewAssignmentModal'));
+          modal.show();
+        } else {
+          alert("Assignment not found!");
+        }
+      } catch (error) {
+        console.error("Error viewing assignment:", error);
+        alert("Failed to load assignment details. Please try again.");
+      }
+    };
+
+    window.editAssignment = function(assignmentId) {
+      alert("Edit assignment functionality will be implemented here for assignment ID: " + assignmentId);
+      // In a real implementation, you would open an edit modal with the assignment data
+    };
+
+    window.deleteAssignment = function(assignmentId) {
+      if (confirm("Are you sure you want to delete this assignment?")) {
+        alert("Delete assignment functionality will be implemented here for assignment ID: " + assignmentId);
+        // In a real implementation, you would delete the assignment document from Firestore
+      }
+    };
+
+    window.filterAssignments = function(filter) {
+      alert("Filtering assignments by: " + filter);
+      // In a real implementation, you would filter the assignments table
+    };
+
+    window.toggleSidebar = function() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("overlay");
+      sidebar.classList.toggle("show");
+      overlay.classList.toggle("show");
+      
+      // Toggle menu icon
+      const menuBtn = document.querySelector('.menu-toggle-btn');
+      if (sidebar.classList.contains('show')) {
+        menuBtn.innerHTML = '<i class="fas fa-times"></i>';
+      } else {
+        menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+      }
+    };
+
+    window.logout = async function() {
+      if (confirm("Are you sure you want to logout?")) {
+        try {
+          await signOut(auth);
+          window.location.href = "faculty_login.html";
+        } catch (error) {
+          alert("Logout failed. Please try again.");
+        }
+      }
+    };
+  </script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Font Awesome -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</body>
+</html>

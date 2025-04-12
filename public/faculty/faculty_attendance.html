@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Attendance Management | Campus Bridge</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --secondary: #3f37c9;
+      --dark: #1f2937;
+      --light: #f8f9fa;
+      --success: #4cc9f0;
+      --danger: #f72585;
+      --warning: #f8961e;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f5f7fb;
+      color: var(--dark);
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      height: 100vh;
+      width: 280px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      padding-top: 20px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1040;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar a {
+      color: rgba(255, 255, 255, 0.9);
+      padding: 12px 25px;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      margin: 5px 15px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar a i {
+      margin-right: 12px;
+      font-size: 1.1rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    .sidebar a:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(5px);
+      color: white;
+    }
+
+    .sidebar a.active {
+      background: white;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .sidebar h2 {
+      color: white;
+      text-align: center;
+      margin: 1.5rem 0;
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+
+    .sidebar-footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 1rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.85rem;
+    }
+
+    /* Overlay */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(3px);
+      z-index: 1030;
+    }
+
+    /* Menu Button */
+    .menu-toggle-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      display: none;
+      z-index: 1050;
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .menu-toggle-btn:hover {
+      transform: scale(1.05);
+      background-color: var(--secondary);
+    }
+
+    /* Main Content */
+    .main-container {
+      margin-left: 280px;
+      padding: 30px;
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Attendance Card */
+    .attendance-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .attendance-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    }
+
+    .attendance-header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      padding: 1.5rem 2rem;
+      color: white;
+    }
+
+    .attendance-header h2 {
+      margin: 0;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+    }
+
+    .attendance-header h2 i {
+      margin-right: 12px;
+    }
+
+    /* Section Tabs */
+    .section-tabs {
+      display: flex;
+      border-bottom: 1px solid #dee2e6;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-tab {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      font-weight: 500;
+      color: #6c757d;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .section-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .section-tab:hover:not(.active) {
+      color: var(--dark);
+      border-bottom-color: #dee2e6;
+    }
+
+    .section-content {
+      display: none;
+    }
+
+    .section-content.active {
+      display: block;
+    }
+
+    /* Date Selection */
+    .date-selection {
+      background-color: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Student Card */
+    .student-card {
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background-color: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      border-left: 4px solid var(--primary);
+    }
+
+    .student-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .student-img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 2px solid #e9ecef;
+    }
+
+    .attendance-options {
+      display: flex;
+      align-items: center;
+    }
+
+    .attendance-option {
+      margin: 0 5px;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .present-option {
+      background-color: rgba(76, 201, 240, 0.1);
+      color: var(--success);
+    }
+
+    .present-option.active {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .absent-option {
+      background-color: rgba(247, 37, 133, 0.1);
+      color: var(--danger);
+    }
+
+    .absent-option.active {
+      background-color: var(--danger);
+      color: white;
+    }
+
+    /* Section Badge */
+    .section-badge {
+      background-color: var(--primary);
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-left: 0.5rem;
+    }
+
+    /* Summary Card */
+    .summary-card {
+      background-color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .summary-item:last-child {
+      border-bottom: none;
+    }
+
+    .submit-btn {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      margin-top: 1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade {
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+
+    /* Mobile Styles */
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .overlay.show {
+        display: block;
+      }
+
+      .menu-toggle-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .main-container {
+        margin-left: 0;
+        padding: 20px;
+        padding-top: 80px;
+      }
+
+      .student-card {
+        flex-direction: column;
+      }
+
+      .attendance-options {
+        margin-top: 1rem;
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Toggle Button -->
+  <button class="menu-toggle-btn" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar">
+    <h2><i class="fas fa-graduation-cap me-2"></i>Campus Bridge</h2>
+    <a href="faculty_dashboard.html">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+    <a href="faculty_courses.html">
+      <i class="fas fa-book-open"></i> Courses
+    </a>
+    <a href="faculty_assignments.html">
+      <i class="fas fa-tasks"></i> Assignments
+    </a>
+    <a href="faculty_attendance.html" class="active">
+      <i class="fas fa-clipboard-check"></i> Attendance
+    </a>
+    <a href="#" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+    <div class="sidebar-footer">
+      © 2023 Campus Bridge | v1.0.0
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="attendance-card animate-fade">
+      <div class="attendance-header">
+        <h2><i class="fas fa-clipboard-check"></i> Attendance Management</h2>
+      </div>
+
+      <div class="p-4">
+        <!-- Date Selection -->
+        <div class="date-selection animate-fade delay-1">
+          <label for="attendanceDate" class="form-label fw-bold">Select Date</label>
+          <input type="date" class="form-control" id="attendanceDate" value="">
+        </div>
+
+        <!-- Section Tabs -->
+        <div class="section-tabs animate-fade delay-2">
+          <div class="section-tab active" onclick="showSection('A10')">A10 - OOMD</div>
+          <div class="section-tab" onclick="showSection('A11')">A11 - OOMD</div>
+        </div>
+
+        <!-- Current Section Indicator -->
+        <div class="alert alert-primary animate-fade delay-2" id="currentSectionIndicator">
+          <i class="fas fa-users me-2"></i> Currently viewing: <strong id="currentSectionText">A10 - OOMD</strong>
+        </div>
+
+        <!-- Section Content -->
+        <div class="section-content active" id="sectionA10Content">
+          <h5 class="mb-3">Students in A10 - OOMD</h5>
+          <div id="studentsA10List">
+            <div class="text-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-content" id="sectionA11Content">
+          <h5 class="mb-3">Students in A11 - OOMD</h5>
+          <div id="studentsA11List">
+            <div class="text-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary Card -->
+        <div class="summary-card animate-fade delay-3">
+          <h5 class="mb-3">Attendance Summary <span class="section-badge" id="summarySectionBadge">A10</span></h5>
+          <div class="summary-item">
+            <span>Total Students:</span>
+            <span id="totalStudents">0</span>
+          </div>
+          <div class="summary-item">
+            <span>Present:</span>
+            <span id="presentCount" class="text-success">0</span>
+          </div>
+          <div class="summary-item">
+            <span>Absent:</span>
+            <span id="absentCount" class="text-danger">0</span>
+          </div>
+          <div class="summary-item">
+            <span>Attendance Percentage:</span>
+            <span id="attendancePercentage">0%</span>
+          </div>
+          <button id="submitBtn" class="submit-btn w-100 mt-3" disabled onclick="submitAttendance()">
+            <i class="fas fa-paper-plane me-2"></i> Submit Attendance for <span id="submitSectionText">A10</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase + Attendance Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+  
+    const firebaseConfig = {
+      apiKey: "AIzaSyD0jz3MOwhA68S7FZkTcN23Ld3olEooaBQ",
+      authDomain: "campusbridge-528c5.firebaseapp.com",
+      projectId: "campusbridge-528c5",
+      storageBucket: "campusbridge-528c5.appspot.com",
+      messagingSenderId: "your-msg-id",
+      appId: "your-app-id"
+    };
+  
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+  
+    // Set today's date as default
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+    document.getElementById('attendanceDate').value = formattedDate;
+    
+    let selectedDate = formattedDate;
+    let selectedSection = 'A10';
+    let attendanceData = {
+      A10: {},
+      A11: {}
+    };
+  
+    const attendanceDate = document.getElementById('attendanceDate');
+    attendanceDate.addEventListener('change', () => {
+      selectedDate = attendanceDate.value;
+      updateSubmitState();
+      // Reload attendance data for the selected date
+      loadStudents('A10');
+      loadStudents('A11');
+    });
+  
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "/login.html";
+      } else {
+        loadStudents('A10');
+        loadStudents('A11');
+      }
+    });
+  
+    async function loadStudents(section) {
+      const listElement = document.getElementById(`students${section}List`);
+      const querySnapshot = await getDocs(collection(db, "students"));
+      listElement.innerHTML = '';
+  
+      // Initialize section data if not exists
+      if (!attendanceData[section]) {
+        attendanceData[section] = {};
+      }
+  
+      let count = 0;
+      querySnapshot.forEach(async docSnap => {
+        const data = docSnap.data();
+        if (data.section === section) {  // Only process students from this section
+          count++;
+          
+          // Check if attendance already exists for this student on the selected date
+          const attendanceDocRef = doc(db, "attendance", `${selectedDate}_${section}_${data.roll}`);
+          const attendanceDoc = await getDoc(attendanceDocRef);
+          const existingStatus = attendanceDoc.exists() ? attendanceDoc.data().status : null;
+          
+          // Store in our attendance data with the correct section
+          attendanceData[section][data.roll] = existingStatus;
+          
+          const card = document.createElement("div");
+          card.className = "student-card d-flex justify-content-between align-items-center";
+          card.innerHTML = `
+            <div class="d-flex align-items-center">
+              <img src="${data.imageURL || 'https://via.placeholder.com/60'}" alt="student" class="student-img me-3">
+              <div>
+                <div class="fw-bold">${data.name} <span class="section-badge">${section}</span></div>
+                <div class="text-muted">${data.roll}</div>
+              </div>
+            </div>
+            <div class="attendance-options">
+              <div class="attendance-option present-option ${existingStatus === 'Present' ? 'active' : ''}" 
+                   onclick="markAttendance('${section}', '${data.roll}', 'Present', this)">Present</div>
+              <div class="attendance-option absent-option ${existingStatus === 'Absent' ? 'active' : ''}" 
+                   onclick="markAttendance('${section}', '${data.roll}', 'Absent', this)">Absent</div>
+            </div>
+          `;
+          listElement.appendChild(card);
+        }
+      });
+  
+      // If no students found
+      if (count === 0) {
+        listElement.innerHTML = '<div class="text-center py-4 text-muted">No students found in this section</div>';
+      }
+  
+      updateSummary();
+    }
+  
+    window.markAttendance = (section, roll, status, element) => {
+      attendanceData[section][roll] = status;
+  
+      const parent = element.parentElement;
+      parent.querySelectorAll('.attendance-option').forEach(opt => opt.classList.remove('active'));
+      element.classList.add('active');
+  
+      updateSummary();
+      updateSubmitState();
+    };
+  
+    function updateSummary() {
+      const currentSectionData = attendanceData[selectedSection];
+      const total = Object.keys(currentSectionData).length;
+      const present = Object.values(currentSectionData).filter(s => s === 'Present').length;
+      const absent = Object.values(currentSectionData).filter(s => s === 'Absent').length;
+      const percentage = total ? ((present / total) * 100).toFixed(1) : 0;
+  
+      document.getElementById('totalStudents').textContent = total;
+      document.getElementById('presentCount').textContent = present;
+      document.getElementById('absentCount').textContent = absent;
+      document.getElementById('attendancePercentage').textContent = `${percentage}%`;
+      document.getElementById('summarySectionBadge').textContent = selectedSection;
+    }
+  
+    function updateSubmitState() {
+      const currentSectionData = attendanceData[selectedSection];
+      const hasAllMarked = Object.values(currentSectionData).every(status => status !== null);
+      document.getElementById('submitBtn').disabled = !(hasAllMarked && selectedDate);
+    }
+  
+    window.submitAttendance = async () => {
+      const confirm = window.confirm(`Are you sure you want to submit attendance for section ${selectedSection}?`);
+      if (!confirm) return;
+  
+      const currentSectionData = attendanceData[selectedSection];
+      const batch = Object.entries(currentSectionData);
+      
+      try {
+        // First verify all students are in the correct section
+        const sectionVerification = await Promise.all(
+          batch.map(async ([roll]) => {
+            const studentDoc = await getDoc(doc(db, "students", roll));
+            return studentDoc.exists() ? studentDoc.data().section : null;
+          })
+        );
+        
+        // Check if any student is in the wrong section
+        const wrongSectionStudents = batch.filter((_, index) => 
+          sectionVerification[index] && sectionVerification[index] !== selectedSection
+        );
+        
+        if (wrongSectionStudents.length > 0) {
+          alert(`Warning: ${wrongSectionStudents.length} students are not in section ${selectedSection}. Please correct their section assignments first.`);
+          return;
+        }
+        
+        // Submit attendance for each student
+        for (const [roll, status] of batch) {
+          const docRef = doc(db, "attendance", `${selectedDate}_${selectedSection}_${roll}`);
+          await setDoc(docRef, {
+            date: selectedDate,
+            section: selectedSection,
+            roll,
+            status,
+            timestamp: new Date().toISOString()
+          });
+        }
+        
+        alert(`Attendance for section ${selectedSection} submitted successfully!`);
+      } catch (error) {
+        console.error("Error submitting attendance: ", error);
+        alert("Failed to submit attendance. Please try again.");
+      }
+    };
+  
+    window.showSection = (section) => {
+      selectedSection = section;
+      
+      // Update UI elements
+      document.querySelectorAll('.section-tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelector(`.section-tab[onclick="showSection('${section}')"]`).classList.add('active');
+  
+      document.querySelectorAll('.section-content').forEach(sc => sc.classList.remove('active'));
+      document.getElementById(`section${section}Content`).classList.add('active');
+      
+      document.getElementById('currentSectionText').textContent = `${section} - OOMD`;
+      document.getElementById('submitSectionText').textContent = section;
+  
+      updateSummary();
+    };
+  
+    window.logout = () => {
+      signOut(auth).then(() => window.location.href = "/login.html");
+    };
+  
+    window.toggleSidebar = () => {
+      document.getElementById('sidebar').classList.toggle('show');
+      document.getElementById('overlay').classList.toggle('show');
+    };
+  </script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

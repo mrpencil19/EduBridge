@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edubridge | Timetable</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --secondary: #3f37c9;
+      --dark: #1f2937;
+      --light: #f8f9fa;
+      --success: #4cc9f0;
+      --danger: #f72585;
+      --warning: #f8961e;
+      --info: #4895ef;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f5f7fb;
+      color: var(--dark);
+      overflow-x: hidden;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      height: 100vh;
+      width: 280px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      padding-top: 20px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1040;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar a {
+      color: rgba(255, 255, 255, 0.9);
+      padding: 12px 25px;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      margin: 5px 15px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar a i {
+      margin-right: 12px;
+      font-size: 1.1rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    .sidebar a:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(5px);
+      color: white;
+    }
+
+    .sidebar a.active {
+      background: white;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .sidebar h2 {
+      color: white;
+      text-align: center;
+      margin: 1.5rem 0;
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+
+    .sidebar-footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 1rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.85rem;
+    }
+
+    /* Overlay */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(3px);
+      z-index: 1030;
+    }
+
+    /* Menu Button */
+    .menu-toggle-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      display: none;
+      z-index: 1050;
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .menu-toggle-btn:hover {
+      transform: scale(1.05);
+      background-color: var(--secondary);
+    }
+
+    /* Main Content */
+    .main-container {
+      margin-left: 280px;
+      padding: 30px;
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Timetable Card */
+    .timetable-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .timetable-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    }
+
+    .timetable-header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      padding: 1.5rem 2rem;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .timetable-header h2 {
+      margin: 0;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+    }
+
+    .timetable-header h2 i {
+      margin-right: 12px;
+    }
+
+    .current-time {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    /* Timetable Table */
+    .timetable-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    .timetable-table th {
+      position: sticky;
+      font-weight: 500;
+      text-align: center;
+      padding: 12px 8px;
+    }
+
+    .day-header {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      min-width: 120px;
+      text-align: left;
+      padding-left: 20px !important;
+    }
+
+    .time-header {
+      background-color: #f1f3f5;
+      font-weight: 500;
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      white-space: nowrap;
+    }
+
+    .timetable-cell {
+      padding: 12px 8px;
+      text-align: center;
+      border: 1px solid #e9ecef;
+      background-color: white;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .timetable-cell:hover {
+      background-color: #f8fafc;
+      transform: scale(1.03);
+      z-index: 1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .current-slot {
+      background-color: #e3f2fd !important;
+      border: 2px solid var(--info) !important;
+      animation: pulse 2s infinite;
+    }
+
+    .current-slot::after {
+      content: "NOW";
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background-color: var(--info);
+      color: white;
+      font-size: 9px;
+      font-weight: bold;
+      padding: 2px 5px;
+      border-radius: 10px;
+      line-height: 1;
+    }
+
+    .empty-slot {
+      background-color: #f8f9fa;
+      color: #adb5bd;
+    }
+
+    /* Subject Badges */
+    .subject-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      background-color: var(--primary);
+      color: #333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(72, 149, 239, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(72, 149, 239, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(72, 149, 239, 0); }
+    }
+
+    .animate-fade {
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    /* Mobile Styles */
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .overlay.show {
+        display: block;
+      }
+
+      .menu-toggle-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .main-container {
+        margin-left: 0;
+        padding: 20px;
+        padding-top: 80px;
+      }
+
+      .timetable-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 1rem;
+      }
+
+      .day-header {
+        min-width: 80px;
+        padding-left: 12px !important;
+        font-size: 0.9rem;
+      }
+
+      .timetable-cell {
+        padding: 8px 4px;
+        font-size: 0.85rem;
+      }
+
+      .subject-badge {
+        font-size: 0.75rem;
+        padding: 3px 6px;
+      }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+  </style>
+</head>
+<body>
+
+
+  <div id="chatbot-toggle" onclick="toggleChatbot()">
+    💬
+  </div>
+  
+  <!-- Chatbot Container (Initially Hidden) -->
+  <div id="chatbot" class="chatbot-container hidden">
+    <div class="chat-header">
+        <span>CampusBot 🤖</span>
+        <span onclick="toggleChatbot()" style="float: right; cursor: pointer;">➖</span>
+      </div>
+      
+    <div class="chat-body" id="chat-body">
+        <div class="chat-body" id="chat-body">
+            <div id="typing" class="typing hidden">
+              <span></span><span></span><span></span>
+            </div>
+          </div>          
+    </div>
+    <div class="chat-footer">
+        <button onclick="startVoice()" id="mic-btn">🎤</button>
+      <input type="text" id="user-input" placeholder="Ask me anything..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+  <!-- Toggle Button -->
+  <button class="menu-toggle-btn" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar">
+    <h2><i class="fas fa-graduation-cap me-2"></i>Edubridge</h2>
+    <a href="student_dashboard.html">
+      <i class="fas fa-user"></i> Profile
+    </a>
+    <a href="student_timetable.html" class="active">
+      <i class="fas fa-calendar-alt"></i> Timetable
+    </a>
+    <a href="student_courses.html">
+      <i class="fas fa-book"></i> Courses
+    </a>
+    <a href="student_assignments.html">
+      <i class="fas fa-tasks"></i> Assignments
+    </a>
+    <a href="student_code_practice.html">
+      <i class="fas fa-code"></i> Code Practice
+    </a>
+    <a href="student_results.html">
+      <i class="fas fa-chart-line"></i> Results
+    </a>
+    <a href="#" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+    <div class="sidebar-footer">
+      © 2023 Edubridge | v1.0.0
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="timetable-card animate-fade">
+      <div class="timetable-header">
+        <h2><i class="fas fa-calendar-alt"></i> My Timetable</h2>
+        <div id="currentTime" class="current-time">
+          <i class="fas fa-clock"></i> Loading...
+        </div>
+      </div>
+      
+      <div class="p-4">
+        <div class="alert alert-info animate-fade">
+          <i class="fas fa-info-circle me-2"></i> 
+          This is your schedule for the current semester. The <span class="fw-bold">highlighted slot</span> indicates your current class.
+        </div>
+        
+        <!-- Timetable will be populated here -->
+        <div class="table-responsive mt-3" id="timetableContainer">
+          <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3 text-muted">Loading your timetable...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase + Sidebar Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD0jz3MOwhA68S7FZkTcN23Ld3olEooaBQ",
+      authDomain: "campusbridge-528c5.firebaseapp.com",
+      projectId: "campusbridge-528c5",
+      storageBucket: "campusbridge-528c5.appspot.com",
+      messagingSenderId: "327991838083",
+      appId: "1:327991838083:web:08964091aaca33752922b6",
+      measurementId: "G-XQ99JCQTDB"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Update current time every minute
+    function updateCurrentTime() {
+      const now = new Date();
+      const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      };
+      document.getElementById('currentTime').innerHTML = 
+        `<i class="fas fa-clock"></i> ${now.toLocaleTimeString('en-US', options)}`;
+    }
+    setInterval(updateCurrentTime, 60000);
+    updateCurrentTime();
+
+    // Redirect if not logged in
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        try {
+          const userDoc = await getDoc(doc(db, "students", user.uid));
+          const userSection = userDoc.exists() ? userDoc.data().section : null;
+          
+          if (userSection) {
+            await loadTimetable(userSection);
+            // Highlight current class every minute
+            setInterval(() => highlightCurrentClass(), 60000);
+          } else {
+            showError("No section assigned to your account. Please contact administration.");
+          }
+        } catch (error) {
+          showError("Error loading user data: " + error.message);
+        }
+      }
+    });
+
+    async function loadTimetable(section) {
+      try {
+        const timetableDocRef = doc(db, "timetable", section);
+        const timetableDoc = await getDoc(timetableDocRef);
+
+        if (timetableDoc.exists()) {
+          const timetableData = timetableDoc.data();
+          displayTimetable(timetableData);
+          highlightCurrentClass();
+        } else {
+          showError(`No timetable found for your section (${section}).`);
+        }
+      } catch (error) {
+        showError("Error loading timetable: " + error.message);
+      }
+    }
+
+    function displayTimetable(timetable) {
+      const days = [
+        { id: "monday", name: "Monday" },
+        { id: "tuesday", name: "Tuesday" },
+        { id: "wednesday", name: "Wednesday" },
+        { id: "thursday", name: "Thursday" },
+        { id: "friday", name: "Friday" }
+      ];
+
+      // Get all unique time slots from all days
+      const allTimeSlots = new Set();
+      days.forEach(day => {
+        if (timetable[day.id]) {
+          timetable[day.id].forEach(slot => {
+            allTimeSlots.add(slot.time);
+          });
+        }
+      });
+      
+      // Convert to array and sort by time
+      const sortedTimeSlots = Array.from(allTimeSlots).sort((a, b) => a.localeCompare(b));
+
+      let timetableHTML = `
+        <div class="table-responsive">
+          <table class="table timetable-table">
+            <thead>
+              <tr>
+                <th class="day-header">Day/Time</th>
+                ${sortedTimeSlots.map(time => {
+                  const [hours, minutes] = time.split(':');
+                  const hour12 = hours % 12 || 12;
+                  const ampm = hours < 12 ? 'AM' : 'PM';
+                  return `<th class="time-header">${hour12}:${minutes}<small>${ampm}</small></th>`;
+                }).join('')}
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      days.forEach(day => {
+        timetableHTML += `
+          <tr>
+            <td class="day-header">
+              <strong>${day.name}</strong>
+            </td>
+        `;
+        
+        sortedTimeSlots.forEach(time => {
+          let subjectContent = '<div class="empty-slot">-</div>';
+          if (timetable[day.id]) {
+            const slot = timetable[day.id].find(s => s.time === time);
+            if (slot) {
+              subjectContent = `
+                <div class="subject-badge" style="background-color: ${getSubjectColor(slot.subject)}">
+                  ${slot.subject}
+                  ${slot.room ? `<div class="text-white-50" style="font-size:0.7em;">${slot.room}</div>` : ''}
+                </div>
+              `;
+            }
+          }
+          
+          timetableHTML += `
+            <td class="timetable-cell" 
+                data-day="${day.id}" 
+                data-time="${time}">
+              ${subjectContent}
+            </td>
+          `;
+        });
+        
+        timetableHTML += `</tr>`;
+      });
+
+      timetableHTML += `</tbody></table></div>`;
+      
+      // Add a filter for mobile view
+      timetableHTML += `
+        <div class="d-block d-md-none mt-3">
+          <select class="form-select" id="dayFilter" onchange="filterTimetable()">
+            <option value="all">All Days</option>
+            ${days.map(day => `<option value="${day.id}">${day.name}</option>`).join('')}
+          </select>
+        </div>
+      `;
+      
+      document.getElementById("timetableContainer").innerHTML = timetableHTML;
+    }
+
+    function getSubjectColor(subject) {
+      // Create consistent colors based on subject name
+      const colors = [
+        '#fff', 
+      ];
+      const hash = subject.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      return colors[hash % colors.length];
+    }
+
+    function highlightCurrentClass() {
+      const now = new Date();
+      const currentDay = now.getDay(); // 0=Sunday, 1=Monday, etc.
+      const currentHours = now.getHours().toString().padStart(2, '0');
+      const currentMinutes = now.getMinutes().toString().padStart(2, '0');
+      const currentTime = `${currentHours}:${currentMinutes}`;
+      
+      // Remove previous highlights
+      document.querySelectorAll('.current-slot').forEach(el => {
+        el.classList.remove('current-slot');
+      });
+      
+      // Only highlight Monday-Friday (1-5)
+      if (currentDay >= 1 && currentDay <= 5) {
+        const dayNames = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+        const currentDayName = dayNames[currentDay - 1];
+        
+        // Find the cell for current day and time
+        const cells = document.querySelectorAll('.timetable-cell');
+        cells.forEach(cell => {
+          if (cell.dataset.day === currentDayName && cell.dataset.time === currentTime) {
+            cell.classList.add('current-slot');
+            
+            // Scroll to current class (if not on mobile)
+            if (window.innerWidth > 768) {
+              cell.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'center'
+              });
+            }
+          }
+        });
+      }
+    }
+
+    function showError(message) {
+      document.getElementById("timetableContainer").innerHTML = `
+        <div class="alert alert-danger animate-fade">
+          <i class="fas fa-exclamation-circle me-2"></i>
+          ${message}
+        </div>
+      `;
+    }
+
+    window.filterTimetable = function() {
+      const dayFilter = document.getElementById('dayFilter').value;
+      const rows = document.querySelectorAll('.timetable-table tbody tr');
+      
+      rows.forEach(row => {
+        const dayCell = row.querySelector('.day-header');
+        if (dayCell) {
+          const dayName = dayCell.textContent.trim().toLowerCase();
+          if (dayFilter === 'all' || dayName === dayFilter) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        }
+      });
+    };
+
+    window.logout = async function() {
+      if (confirm("Are you sure you want to logout?")) {
+        try {
+          await signOut(auth);
+          window.location.href = "login.html";
+        } catch (error) {
+          alert("Logout failed. Please try again.");
+        }
+      }
+    };
+
+    window.toggleSidebar = function() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("overlay");
+      sidebar.classList.toggle("show");
+      overlay.classList.toggle("show");
+      
+      // Toggle menu icon
+      const menuBtn = document.querySelector('.menu-toggle-btn');
+      if (sidebar.classList.contains('show')) {
+        menuBtn.innerHTML = '<i class="fas fa-times"></i>';
+      } else {
+        menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+      }
+    };
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

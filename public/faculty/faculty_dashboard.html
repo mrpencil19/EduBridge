@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Faculty Dashboard | Campus Bridge</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --secondary: #3f37c9;
+      --dark: #1f2937;
+      --light: #f8f9fa;
+      --success: #4cc9f0;
+      --danger: #f72585;
+      --warning: #f8961e;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f5f7fb;
+      color: var(--dark);
+      min-height: 100vh;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      height: 100vh;
+      width: 280px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      padding-top: 20px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1040;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar a {
+      color: rgba(255, 255, 255, 0.9);
+      padding: 12px 25px;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      margin: 5px 15px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar a i {
+      margin-right: 12px;
+      font-size: 1.1rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    .sidebar a:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(5px);
+      color: white;
+    }
+
+    .sidebar a.active {
+      background: white;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .sidebar h2 {
+      color: white;
+      text-align: center;
+      margin: 1.5rem 0;
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+
+    .sidebar-footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 1rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.85rem;
+    }
+
+    /* Overlay */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(3px);
+      z-index: 1030;
+    }
+
+    /* Menu Button */
+    .menu-toggle-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      display: none;
+      z-index: 1050;
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .menu-toggle-btn:hover {
+      transform: scale(1.05);
+      background-color: var(--secondary);
+    }
+
+    /* Main Content */
+    .main-container {
+      margin-left: 280px;
+      padding: 30px;
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Profile Card */
+    .profile-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .profile-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      padding: 2rem 0;
+      text-align: center;
+      color: white;
+      position: relative;
+    }
+
+    .profile-header::after {
+      content: '';
+      position: absolute;
+      bottom: -20px;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: white;
+      border-radius: 50% 50% 0 0;
+    }
+
+    .profile-img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 4px solid white;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      z-index: 2;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .profile-img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .profile-name {
+      font-weight: 600;
+      margin-top: 1rem;
+      font-size: 1.5rem;
+    }
+
+    .profile-role {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      display: inline-block;
+      margin-top: 0.5rem;
+    }
+
+    .profile-body {
+      padding: 2rem;
+    }
+
+    /* Info Items */
+    .info-item {
+      display: flex;
+      margin-bottom: 1.2rem;
+      align-items: flex-start;
+    }
+
+    .info-icon {
+      background: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      flex-shrink: 0;
+    }
+
+    .info-content h5 {
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      color: var(--dark);
+    }
+
+    .info-content p {
+      color: #6b7280;
+      margin-bottom: 0;
+    }
+
+    /* Dashboard Buttons */
+    .dashboard-btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      margin: 8px;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 200px;
+      border: none;
+    }
+
+    .dashboard-btn i {
+      margin-right: 8px;
+    }
+
+    .courses-btn {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .courses-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+    }
+
+    .assignments-btn {
+      background: linear-gradient(135deg, var(--success), #38b6db);
+      color: white;
+      box-shadow: 0 4px 15px rgba(76, 201, 240, 0.3);
+    }
+
+    .assignments-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(76, 201, 240, 0.4);
+    }
+
+    .logout-btn {
+      background: linear-gradient(135deg, var(--danger), #d63384);
+      color: white;
+      box-shadow: 0 4px 15px rgba(247, 37, 133, 0.3);
+    }
+
+    .logout-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(247, 37, 133, 0.4);
+    }
+
+    /* Stats Cards */
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+
+    .stat-icon.courses {
+      background-color: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+    }
+
+    .stat-icon.students {
+      background-color: rgba(76, 201, 240, 0.1);
+      color: var(--success);
+    }
+
+    .stat-icon.attendance {
+      background-color: rgba(247, 37, 133, 0.1);
+      color: var(--danger);
+    }
+
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade {
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+
+    /* Mobile Styles */
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .overlay.show {
+        display: block;
+      }
+
+      .menu-toggle-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .main-container {
+        margin-left: 0;
+        padding: 20px;
+        padding-top: 80px;
+      }
+
+      .stats-container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Toggle Button -->
+  <button class="menu-toggle-btn" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar">
+    <h2><i class="fas fa-graduation-cap me-2"></i>Campus Bridge</h2>
+    <a href="faculty_dashboard.html" class="active">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+    <a href="faculty_courses.html">
+      <i class="fas fa-book-open"></i> Courses
+    </a>
+    <a href="faculty_assignments.html">
+      <i class="fas fa-tasks"></i> Assignments
+    </a>
+    <a href="faculty_attendance.html">
+      <i class="fas fa-clipboard-check"></i> Attendance
+    </a>
+    <a href="#" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+    <div class="sidebar-footer">
+      © 2023 Campus Bridge | v1.0.0
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="profile-card animate-fade">
+      <div class="profile-header">
+        <img id="profileImage" src="https://via.placeholder.com/150" class="profile-img" alt="Faculty Image"/>
+        <h3 id="facultyName" class="profile-name">Loading...</h3>
+        <div class="profile-role">Faculty</div>
+      </div>
+      
+      <div class="profile-body">
+        <!-- Stats Cards -->
+        <div class="stats-container mb-4">
+          <div class="stat-card animate-fade delay-1">
+            <div class="stat-icon courses">
+              <i class="fas fa-book-open"></i>
+            </div>
+            <div class="stat-value" id="courseCount">0</div>
+            <div class="stat-label">Courses Assigned</div>
+          </div>
+        </div>
+
+        <div id="profileData">
+          <!-- Profile data will be loaded here -->
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="text-center mt-5">
+          <button onclick="logout()" class="dashboard-btn logout-btn animate-fade delay-3">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD0jz3MOwhA68S7FZkTcN23Ld3olEooaBQ",
+      authDomain: "campusbridge-528c5.firebaseapp.com",
+      projectId: "campusbridge-528c5",
+      storageBucket: "campusbridge-528c5.appspot.com",
+      messagingSenderId: "327991838083",
+      appId: "1:327991838083:web:08964091aaca33752922b6",
+      measurementId: "G-XQ99JCQTDB"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const profileContainer = document.getElementById("profileData");
+    const profileImage = document.getElementById("profileImage");
+    const facultyName = document.getElementById("facultyName");
+    const courseCount = document.getElementById("courseCount");
+    const studentCount = document.getElementById("studentCount");
+    const attendancePercentage = document.getElementById("attendancePercentage");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const uid = user.uid;
+
+        try {
+          // Fetch faculty profile data from Firestore
+          const teacherRef = doc(db, "teachers", uid);
+          const teacherSnap = await getDoc(teacherRef);
+
+          if (teacherSnap.exists()) {
+            const data = teacherSnap.data();
+
+            // Display profile image
+            profileImage.src = data.imageBase64 || "https://ui-avatars.com/api/?name=" + 
+              encodeURIComponent(data.name || "Faculty") + "&background=random";
+            
+            // Set faculty name
+            facultyName.textContent = data.name || "Faculty Member";
+            
+            // Generate profile info
+            let infoHTML = '';
+            const infoFields = [
+              { icon: "fas fa-envelope", label: "Email", value: data.email || user.email || "N/A" },
+              { icon: "fas fa-phone", label: "Phone", value: data.phone || "N/A" },
+              { icon: "fas fa-university", label: "Department", value: data.department || "N/A" },
+            ];
+
+            infoFields.forEach((field, index) => {
+              infoHTML += `
+                <div class="info-item animate-fade delay-${index}">
+                  <div class="info-icon">
+                    <i class="${field.icon}"></i>
+                  </div>
+                  <div class="info-content">
+                    <h5>${field.label}</h5>
+                    <p>${field.value}</p>
+                  </div>
+                </div>
+              `;
+            });
+
+            profileContainer.innerHTML = infoHTML;
+
+            // Load stats data
+            await loadStatsData(uid);
+          } else {
+            profileContainer.innerHTML = `
+              <div class="alert alert-warning animate-fade">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Faculty profile not found.
+              </div>
+            `;
+          }
+        } catch (error) {
+          console.error("Error loading profile:", error);
+          profileContainer.innerHTML = `
+            <div class="alert alert-danger animate-fade">
+              <i class="fas fa-exclamation-circle me-2"></i>
+              Error loading profile data. Please try again later.
+            </div>
+          `;
+        }
+      } else {
+        window.location.href = "faculty_login.html";
+      }
+    });
+
+    // Load stats data
+    async function loadStatsData(facultyId) {
+      try {
+        // Get courses count
+        const coursesRef = collection(db, "courses");
+        const coursesQuery = await getDocs(coursesRef);
+        let facultyCourses = 0;
+        
+        coursesQuery.forEach(doc => {
+          const course = doc.data();
+          if (course.facultyId === facultyId) {
+            facultyCourses++;
+          }
+        });
+        
+        courseCount.textContent = facultyCourses;
+
+        // Get students count (from faculty's sections)
+        const studentsRef = collection(db, "students");
+        const studentsQuery = await getDocs(studentsRef);
+        let students = 0;
+        let totalAttendance = 0;
+        let attendanceRecords = 0;
+        
+        studentsQuery.forEach(doc => {
+          const student = doc.data();
+          if (student.section && student.section.startsWith("A")) { // Example: Only count section A
+            students++;
+          }
+          
+          if (student.attendancePercentage) {
+            totalAttendance += student.attendancePercentage;
+            attendanceRecords++;
+          }
+        });
+        
+        studentCount.textContent = students;
+        
+        // Calculate average attendance
+        const avgAttendance = attendanceRecords > 0 ? Math.round(totalAttendance / attendanceRecords) : 0;
+        attendancePercentage.textContent = `${avgAttendance}%`;
+        
+      } catch (error) {
+        console.error("Error loading stats:", error);
+      }
+    }
+
+    // Navigate to course management page
+    window.navigateToCourses = function() {
+      window.location.href = "faculty_courses.html";
+    };
+
+    // Navigate to assignments page
+    window.navigateToAssignments = function() {
+      window.location.href = "faculty_assignments.html";
+    };
+
+    // Logout function
+    window.logout = async function() {
+      if (confirm("Are you sure you want to logout?")) {
+        try {
+          await signOut(auth);
+          window.location.href = "faculty_login.html";
+        } catch (error) {
+          alert("Logout failed. Please try again.");
+        }
+      }
+    };
+
+    window.toggleSidebar = function() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("overlay");
+      sidebar.classList.toggle("show");
+      overlay.classList.toggle("show");
+      
+      // Toggle menu icon
+      const menuBtn = document.querySelector('.menu-toggle-btn');
+      if (sidebar.classList.contains('show')) {
+        menuBtn.innerHTML = '<i class="fas fa-times"></i>';
+      } else {
+        menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+      }
+    };
+  </script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Font Awesome -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</body>
+</html>
